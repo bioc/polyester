@@ -88,4 +88,3 @@ seq_gtf = function(gtf, seqs, exononly=TRUE, idfield="transcript_id",
     DNAStringSet(lapply(split_list, unlist)) 
     #took 340 sec on whole human transcriptome hg19
 }
-

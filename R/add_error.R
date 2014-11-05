@@ -34,4 +34,3 @@ add_error = function(tFrags, error_rate = 0.005){
     names(eFrags) = names(tFrags)
     return(eFrags)
 }
-

@@ -41,7 +41,12 @@
 #' @param size the negative binomial \code{size} parameter (see 
 #'   \code{\link{NegBinomial}}) for the number of reads drawn per transcript. 
 #'   If left blank, defaults to \code{reads_per_transcript / 3}. Negative 
-#'   binomial variance is mean + mean^2 / size.
+#'   binomial variance is mean + mean^2 / size. Can either be left at default,
+#'   a vector of the same length as number of transcripts in \code{fasta},
+#'   if the two groups should have the same size parameters, or a list with 2
+#'   elements, each of which is a vector with length equal to the number of 
+#'   transcripts in \code{fasta}, which represent the size parameters for each
+#'   transcript in groups 1 and 2, respectively.
 #' @param outdir character, path to folder where simulated reads should be 
 #'   written, with *no* slash at the end. By default, reads are 
 #'   written to current working directory.
@@ -148,15 +153,24 @@ simulate_experiment = function(fasta=NULL, gtf=NULL, seqpath=NULL, num_reps=10,
         reads_per_transcript/fold_changes, reads_per_transcript)
     basemeans2 = round(basemeans2)
 
-    if(is.null(size)){
-        size = reads_per_transcript/3
+    if (is.null(size)) {
+        nbdp1 = basemeans1/3
+        nbdp2 = basemeans2/3
     }
-
-    if(length(size) == 1){
-        nbdp1 = nbdp2 = size
+    else if(class(size)=='list'){
+        stopifnot(length(size)==2)
+        stopifnot(length(size[[1]]) == length(basemeans1))
+        stopifnot(length(size[[2]]) == length(basemeans2))
+        nbdp1 = size[[1]]
+        nbdp2 = size[[2]]
     }else{
-        nbdp1 = size[1:n1]
-        nbdp2 = size[(1:n2)+n1] 
+        if(length(size) == 1 | length(size) == length(basemeans1)){
+            nbdp1 = nbdp2 = size
+        }else{
+            stop(.makepretty('size must either be NULL, length 1,
+                or a vector with the same number of elements as
+                transcripts you have.'))
+        }
     }
 
     numreadsList = vector("list", n1+n2)

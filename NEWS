@@ -1,4 +1,9 @@
-New in version 0.99.1, 22 September 2014:
+New in version 1.0.1, 5 November 2014:
+    * corrected size parameter specification in simulate_experiment. (If size was provided as vector, subsets taken were too short, and error was thrown).
+
+Version 0.99.2 became part of bioc-release and was released as Version 1.0.0.
+
+New in version 0.99.2, 22 September 2014:
     * fixed bug where read names were incorrect in output fasta files
     * updated vignette
     * added biocViews

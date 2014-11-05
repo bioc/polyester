@@ -29,4 +29,3 @@ generate_fragments = function(tObj, fraglen, fragsd=25){
     return(tObj)
 }
 
-

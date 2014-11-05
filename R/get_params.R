@@ -56,4 +56,3 @@ get_params = function(counts, threshold=NULL){
     fit = smooth.spline(lsize ~ lmu)
     return(list(p0=p0, mu=mu, size=size, fit=fit))
 }
-

@@ -1,7 +1,3 @@
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{The Polyester package for simulating RNA-seq reads}
--->
 # Introduction
 
 Polyester is an R package designed to simulate an RNA sequencing experiment. Given a set of annotated transcripts, polyester will simulate the steps of an RNA-seq experiment (fragmentation, reverse-complementing, and sequencing) and produce files containing simulated RNA-seq reads. Simulated reads can be analyzed using any of several downstream analysis tools. 
@@ -19,7 +15,8 @@ Polyester was developed with several specific features in mind:
 
 Start R and run:
 
-```{r installme, eval=FALSE}
+
+```r
 source("http://bioconductor.org/biocLite.R")
 biocLite("polyester")
 ```
@@ -42,7 +39,8 @@ A FASTA file called `chr22.fa` is provided with `polyester`. This file contains 
 
 To simulate a two-group experiment with 10 biological replicates in each group where the first 3 transcripts are differentially expressed with a fold change of 4, you can use code like this:
 
-```{r builtinex, warning=FALSE, message=FALSE}
+
+```r
 library(polyester)
 library(Biostrings)
 
@@ -64,7 +62,8 @@ The `simulate_experiment` function draws the number of reads to simulate from ea
 
 For more flexibility, you can use the `simulate_experiment_countmat` function. For example, we may want to simulate timecourse data. To do this, we can explicitly specify the number of reads for each transcript (rows), at each timepoint (columns). We will again only simulate from 20 transcripts.
 
-```{r countmat}
+
+```r
 # set up matrix:
 num_timepoints = 12
 countmat = matrix(readspertx, nrow=length(small_fasta), ncol=num_timepoints)
@@ -115,52 +114,33 @@ See `?simulate_experiment` and `?simulate_experiment_countmat` for details on ho
 
 To create a count matrix that resembles a real dataset, use the `create_read_numbers` function. To run this example, you will need to install the Ballgown package from Bioconductor if you do not already have it:
 
-```{r installbg, eval=FALSE}
+
+```r
 source("http://bioconductor.org/biocLite.R")
 biocLite("ballgown")
 ```
 
-```{r loadbg, warning=FALSE, message=FALSE}
+
+```r
 library(ballgown)
 ```
 
-```{r datasim}
+
+```r
+library(ballgown)
 data(bg)
 countmat = fpkm_to_counts(bg, threshold=0.01, mean_rps=400000)
 params = get_params(countmat)
 Ntranscripts = 50
 Nsamples = 10
-custom_readmat = create_read_numbers(mu=params$mu, fit=params$fit,
-    p0=params$p0, m=Ntranscripts, n=Nsamples, seed=103)
+custom_readmat = create_read_numbers(mu=params$mu, fit=params$fit, p0=params$p0, m=Ntranscripts, n=Nsamples, seed=103)
+```
+
+```
+## Generating data from baseline model.
 ```
 
 The Ballgown package here is optional: the mean/variance relationship for each transcript can be estimated from any matrix of counts using `get_params`. You can add differential expression to the output from `create_read_numbers` (here, `custom_readmat`) and pass the resulting matrix to `simulate_experiment_countmat`.
-
-### error models
-Sequencing error is part of the read generation process, so Polyester provides three options for simulating this sequencing error:
-
-#### option 1: uniform error model
-Simulate a uniform error model (equal probability of making each sequencing error at each base) by speficying a single parameter, `error_rate`, in your call to `simulate_experiment` or `simulate_experiment_countmat`. 
-
-#### option 2: built-in empirical error model
-Simulate sequencing error based on one of three empirical error models published with GemSIM ([paper](http://www.biomedcentral.com/1471-2164/13/74), [software](http://sourceforge.net/projects/gemsim/)). The GemSIM software ships with three different empirical error models: one from Illumina Genome Analyzer IIx with Illumina Sequencing Kit v4 chemistry (`illumina4`), Illumina Genome Analyzer IIx with TrueSeq SBS Kit v5-GA (`illumina5`), and Roche/454 FLX Titanium (`roche454`). Specify, e.g., `error_model = 'illumina4` in your call to `simulate_experiment` or `simulate_experiment_countmat` to use an empirical error model. The error rate for each nucleotide in a sequencing read depends on the following:
-
-* position in the read (error probability tends to increase at the end of a read)
-* which mate in a pair the read is (if paired)
-* the true nucleotide being sequenced at that position.
-
-In addition, separate error probabilities are estimated for each of the 4 possible sequencing errors (the 3 incorrect nucleotides + 'N'). Details on the GemSIM error model are available in the [GemSIM paper](http://www.biomedcentral.com/1471-2164/13/74), and details/code we used to create the error models that ship with Polyester are available at our [GitHub repository](https://github.com/alyssafrazee/polyester/blob/master/ErrorModels.md). 
-
-#### option 3: use your own empirical error model
-If you would like to simulate reads with a sequencing error model derived from a set of aligned reads, you can do so by running the `GemErr.py` program from [GemSIM](http://www.biomedcentral.com/1471-2164/13/74). The software is available from [Sourceforge](http://sourceforge.net/projects/gemsim/) and includes a Manual with detailed instructions. You can provide a list of known SNP locations when estimating sequencing error probabilities. 
-
-You will then need to run our script, `[build_error_models.py](https://github.com/alyssafrazee/polyester/blob/master/build_error_models.py)`, using the output directory from `GemErr.py` as the `model_path` argument and specifying `--prefix mymodelname`, where the output file from `GemErr.py` is either `mymodelname_p.gzip` (paired-end model) or `mymodelname_s.gzip` (single-end model). If your error model is paired end, you will also need to specify `--paired`. So your full command could look like:
-
-```
-python build_error_model.py /path/to/gemerr_output /path/to/custom_output --prefix mymodelname --paired
-```
-
-When using the custom error model in the Polyester R package, you will need to provide `/path/to/custom_output` and whatever was given as the `--prefix` argument, in your call to `simulate_experiment` or `simulate_experiment_countmat`. You will also need to specify `error_model = 'custom'`. 
 
 ## Output
 A call to `simulate_experiment` or `simulate_experiment_countmat` will write FASTA files to the directory specified by the `outdir` argument. Reads in the FASTA file will be labeled with the transcript from which they were simulated.
@@ -176,8 +156,51 @@ Report bugs as issues on our [GitHub repository](https://github.com/alyssafrazee
 
 # Session Information
 
-```{r info, results='markup'}
+
+```r
 sessionInfo()
+```
+
+```
+## R version 3.1.0 (2014-04-10)
+## Platform: x86_64-apple-darwin10.8.0 (64-bit)
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] stats4    parallel  stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] ballgown_0.99.5      Biostrings_2.33.14   XVector_0.5.8       
+##  [4] IRanges_1.99.28      S4Vectors_0.2.4      BiocGenerics_0.11.5 
+##  [7] polyester_0.99.1     knitr_1.6            devtools_1.5        
+## [10] BiocInstaller_1.15.5
+## 
+## loaded via a namespace (and not attached):
+##  [1] annotate_1.43.5          AnnotationDbi_1.27.10   
+##  [3] BatchJobs_1.3            BBmisc_1.7              
+##  [5] Biobase_2.25.0           BiocParallel_0.99.19    
+##  [7] bitops_1.0-6             brew_1.0-6              
+##  [9] checkmate_1.4            codetools_0.2-9         
+## [11] DBI_0.3.0                digest_0.6.4            
+## [13] evaluate_0.5.5           fail_1.2                
+## [15] foreach_1.4.2            formatR_1.0             
+## [17] genefilter_1.47.6        GenomeInfoDb_1.1.19     
+## [19] GenomicAlignments_1.1.29 GenomicRanges_1.17.40   
+## [21] grid_3.1.0               httr_0.5                
+## [23] iterators_1.0.7          lattice_0.20-29         
+## [25] limma_3.21.15            Matrix_1.1-4            
+## [27] memoise_0.2.1            mgcv_1.8-3              
+## [29] nlme_3.1-117             RColorBrewer_1.0-5      
+## [31] RCurl_1.95-4.3           Rsamtools_1.17.33       
+## [33] RSQLite_0.11.4           rtracklayer_1.25.16     
+## [35] sendmailR_1.1-2          splines_3.1.0           
+## [37] stringr_0.6.2            survival_2.37-7         
+## [39] sva_3.11.4               tools_3.1.0             
+## [41] whisker_0.3-2            XML_3.98-1.1            
+## [43] xtable_1.7-3             zlibbioc_1.11.1
 ```
 
 

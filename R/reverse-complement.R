@@ -19,4 +19,3 @@ reverse_complement = function(tObj, seed=NULL){
     return(tObj)
 }
 
-
