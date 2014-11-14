@@ -23,8 +23,8 @@ generate_fragments = function(tObj, fraglen, fragsd=25){
     fraglens = round(rnorm(L, mean=fraglen, sd=fragsd)) 
     s = which(fraglens < L)
     tObj[s] = subseq(tObj[s], 
-        start = floor(runif(length(s), 
-            min=rep(1,length(s)), max=L[s]-fraglens[s])), 
+        start = round(runif(length(s), 
+            min=rep(1,length(s)), max=L[s]-fraglens[s]+1)), 
         width=fraglens[s])
     return(tObj)
 }
