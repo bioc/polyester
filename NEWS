@@ -1,3 +1,6 @@
+New in version 1.0.2, 16 November 2014:
+    * bug fix in fragment generation (last 2 based of transcript were never sequenced)
+
 New in version 1.0.1, 5 November 2014:
     * corrected size parameter specification in simulate_experiment. (If size was provided as vector, subsets taken were too short, and error was thrown).
 
