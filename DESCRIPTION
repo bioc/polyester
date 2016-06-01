@@ -2,7 +2,6 @@ Package: polyester
 Maintainer: Alyssa Frazee <alyssa.frazee@gmail.com>, Jeff Leek
     <jtleek@gmail.com>
 Author: Alyssa C. Frazee, Andrew E. Jaffe, Jeffrey T. Leek
-Version: 1.8.1
 Version: 1.8.3
 License: Artistic-2.0
 Title: Simulate RNA-seq reads
