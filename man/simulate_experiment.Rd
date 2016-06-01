@@ -5,7 +5,11 @@
 \usage{
 simulate_experiment(fasta = NULL, gtf = NULL, seqpath = NULL,
   outdir = ".", num_reps = c(10, 10), reads_per_transcript = 300,
+<<<<<<< HEAD
   size = NULL, fold_changes, paired = TRUE, ...)
+=======
+  size = NULL, fold_changes, paired = TRUE, reportCoverage = FALSE, ...)
+>>>>>>> master
 }
 \arguments{
 \item{fasta}{path to FASTA file containing transcripts from which to simulate
@@ -163,8 +167,24 @@ Reads can either be simulated from a FASTA file of transcripts
   fasta files. Defaults to \code{names(readDNAStringSet(fasta))}. This
   option is useful if default names are very long or contain special
   characters.
+<<<<<<< HEAD
   \item You can also include other parameters to pass to
   \code{\link{seq_gtf}} if you're simulating from a GTF file.
+=======
+  \item \code{gzip}: pass \code{gzip=TRUE} to write gzipped fasta files as
+  output (by default, fasta output files are not compressed when written to
+  disk).
+  \item \code{exononly}: (passed to \code{\link{seq_gtf}}) if \code{TRUE}
+  (as it is by default), only create transcript sequences from the features
+  labeled \code{exon} in \code{gtf}.
+  \item \code{idfield}: (passed to \code{\link{seq_gtf}})in the
+  \code{attributes} column of \code{gtf}, what is the name of the field
+  identifying transcripts? Should be character. Default
+  \code{"transcript_id"}.
+  \item \code{attrsep}: (passed to \code{\link{seq_gtf}}) in the
+  \code{attributes} column of \code{gtf}, how are attributes separated?
+  Default \code{"; "}.
+>>>>>>> master
   }
 }
 \examples{
@@ -174,8 +194,14 @@ Reads can either be simulated from a FASTA file of transcripts
   fastapath = system.file("extdata", "chr22.fa", package="polyester")
   numtx = count_transcripts(fastapath)
   set.seed(4)
+<<<<<<< HEAD
   fold_changes = sample(c(0.5, 1, 2), size=numtx,
      prob=c(0.05, 0.9, 0.05), replace=TRUE)
+=======
+  fold_change_values = sample(c(0.5, 1, 2), size=2*numtx,
+     prob=c(0.05, 0.9, 0.05), replace=TRUE)
+  fold_changes = matrix(fold_change_values, nrow=numtx)
+>>>>>>> master
   library(Biostrings)
   # remove quotes from transcript IDs:
   tNames = gsub("'", "", names(readDNAStringSet(fastapath)))
