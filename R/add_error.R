@@ -8,26 +8,22 @@
 #' @return DNAStringSet equivalent to \code{tFrags} but with random sequencing
 #'   errors inserted
 #' @examples
-#'   library(Biostrings)
+#'   require(Biostrings)
 #'   data(srPhiX174)
 #'   set.seed(174)
 #'   srPhiX174_withError = add_error(srPhiX174)
 #'   #error was introduced in, e.g., position 10 of 2nd string in set.
 add_error = function(tFrags, error_rate = 0.005){
-    adj_error = error_rate*5/4 
+    adj_error = error_rate*4/3 
     #^so you don't have to choose *another* nucleotide for an error: just 
     # choose *a* nucleotide.
     
-<<<<<<< HEAD
-    allSeq = unlist(tFrags)
-=======
     allSeq = Biostrings::unlist(tFrags)
->>>>>>> master
     insertLocs = Rle(sample(c(TRUE,FALSE), size = length(allSeq), 
            replace=TRUE, prob = c(adj_error, 1-adj_error)))
   
     newletters = DNAString(
-        paste(sample(c('A', 'C', 'G', 'T', 'N'), sum(insertLocs), 
+        paste(sample(c("A", "C", "G", "T"), sum(insertLocs), 
             replace=TRUE), collapse="") )
     allSeq = replaceLetterAt(allSeq, insertLocs, newletters)
     
@@ -38,4 +34,3 @@ add_error = function(tFrags, error_rate = 0.005){
     names(eFrags) = names(tFrags)
     return(eFrags)
 }
-

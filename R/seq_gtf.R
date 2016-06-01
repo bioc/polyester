@@ -9,8 +9,6 @@
 #'   containing one DNAString per chromosome in \code{gtf}, representing its 
 #'   sequence. In the latter case, \code{names(seqs)} should contain the
 #'   same entries as the \code{seqnames} (first) column of \code{gtf}.
-#' @param feature one of \code{'transcript'} or \code{'exon'} (default 
-#'   transcript), depending on desired return.
 #' @param exononly if \code{TRUE} (as it is by default), only create transcript
 #'   sequences from the features labeled \code{exon} in \code{gtf}.
 #' @param idfield in the \code{attributes} column of \code{gtf}, what is the
@@ -20,23 +18,16 @@
 #'   attributes separated? Default \code{"; "}.
 #' @export
 #' @references \url{http://www.ensembl.org/info/website/upload/gff.html}
-#' @return 
-#'   If feature is \code{'transcript'}, DNAStringSet containing 
-#'   transcript sequences, with names corresponding to \code{idfield} in
-#'   \code{gtf}. If feature is \code{'exon'}, DNAStringSet containing exon
-#'   sequences from \code{gtf}, named by exon location (chr, start, end, 
-#'   strand).
-#' @examples  \dontrun{
+#' @return DNAStringSet containing transcript sequences, with names
+#'   corresponding to \code{idfield} in \code{gtf}
+#' @examples 
 #'   library(Biostrings)
-#'   system('wget https://www.dropbox.com/s/04i6msi9vu2snif/chr22seq.rda')
-#'   load('chr22seq.rda')
+#'   load(url('http://biostat.jhsph.edu/~afrazee/chr22seq.rda'))
 #'   data(gtf_dataframe)
 #'   chr22_processed = seq_gtf(gtf_dataframe, chr22seq)
-#'}
-seq_gtf = function(gtf, seqs, feature='transcript', exononly=TRUE, 
-    idfield='transcript_id', attrsep="; "){
-
-    feature = match.arg(feature, c('transcript', 'exon'))
+#'
+seq_gtf = function(gtf, seqs, exononly=TRUE, idfield="transcript_id", 
+    attrsep="; "){
 
     gtfClasses = c("character", "character", "character", "integer", 
         "integer", "character", "character", "character", "character")
@@ -77,42 +68,23 @@ seq_gtf = function(gtf, seqs, feature='transcript', exononly=TRUE,
     if(!(all(lookingFor %in% fafiles))){
         stop("all chromosomes in gtf must have corresponding sequences in seqs")
     }
-    
+
     seqlist = lapply(chrs, function(chr){
-        dftmp = gtf_dat[gtf_dat[,1] == chr,]
+        dftmp = gtf_dat[gtf_dat[,1]==chr,]
         if(is.character(seqs)){
             fullseq = readDNAStringSet(paste0(seqs, '/', chr, '.fa'))
         } else {
             fullseq = seqs[which(names(seqs) == chr)]
         }
-        if(feature == 'exon'){
-            dftmp = dftmp[!duplicated(dftmp[,c(1,4,5,7)]),] #unique exons
-        }
-        these_seqs = subseq(rep(fullseq, times=nrow(dftmp)), 
-            start=dftmp$start, end=dftmp$end)
-        if(feature == 'transcript'){
-            names(these_seqs) = getAttributeField(dftmp$attributes, idfield, 
-                attrsep=attrsep)
-            if(substr(names(these_seqs)[1],1,1) == '"'){
-                x = names(these_seqs)
-                names(these_seqs) = substr(x, 2, nchar(x)-1)
-            }
-        }else{
-            names(these_seqs) = paste0(dftmp[,1], ':', dftmp[,4], '-', 
-                dftmp[,5], '(', dftmp[,7], ')')
-        }
-        revstrand = which(dftmp$strand == '-')
-        these_seqs[revstrand] = reverseComplement(these_seqs[revstrand])
+        these_seqs = subseq(rep(fullseq, times=nrow(dftmp)), start=dftmp$start,
+            end=dftmp$end)
+        names(these_seqs) = getAttributeField(dftmp$attributes, idfield, 
+            attrsep=attrsep)
         these_seqs
     })
 
     full_list = do.call(c, seqlist)
-
-    if(feature == 'exon'){
-        return(full_list)
-    }else{
-        split_list = split(full_list, names(full_list))
-        return(DNAStringSet(lapply(split_list, unlist)))
-    }
+    split_list = split(full_list, names(full_list))
+    DNAStringSet(lapply(split_list, unlist)) 
+    #took 340 sec on whole human transcriptome hg19
 }
-

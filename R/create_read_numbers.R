@@ -27,8 +27,6 @@
 #'   Nsamples = 10
 #'   custom_readmat = create_read_numbers(mu=params$mu, fit=params$fit, 
 #'     p0=params$p0, m=Ntranscripts, n=Nsamples, seed=103)
-#'
-
 
 create_read_numbers = function(mu, fit, p0, m=NULL, n=NULL, mod=NULL, beta=NULL, 
     seed=NULL){
